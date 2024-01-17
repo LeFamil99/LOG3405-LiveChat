@@ -1,9 +1,11 @@
+package Server;
+
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.util.Scanner;
 public class Serveur {
-    private static ServerSocket Listener; // Application Serveur
+    private static ServerSocket Listener; // Application Server.Serveur
     public static void main(String[] args) throws Exception {
         int clientNumber = 0;
 
