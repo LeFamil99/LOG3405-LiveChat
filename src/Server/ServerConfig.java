@@ -1,36 +1,34 @@
 package Server;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.util.Scanner;
-public class Serveur {
-    private static ServerSocket Listener; // Application Server.Serveur
-    public static void main(String[] args) throws Exception {
-        int clientNumber = 0;
 
-        // Ask user for server address and port
-        Scanner scanner = new Scanner(System.in);
-        String serverAddress = getServerAddress(scanner);
-        int serverPort = getServerPort(scanner);
+public class ServerConfig {
+    private String serverAddress;
+    private int serverPort;
 
-        Listener = new ServerSocket();
-        Listener.setReuseAddress(true);
-        InetAddress serverIP = InetAddress.getByName(serverAddress);
-
-        Listener.bind(new InetSocketAddress(serverIP, serverPort));
-        System.out.format("The server is running on %s:%d%n", serverAddress, serverPort);
-        try {
-            while (true) {
-                // accept() function blocks until new user connects
-                new ClientHandler(Listener.accept(), clientNumber++).start();
-            }
-        } finally {
-            Listener.close();
-        }
+    public String getServerAddress() {
+        return serverAddress;
     }
 
-    private static String getServerAddress(Scanner scanner) {
+    public void setServerAddress(String serverAddress) {
+        this.serverAddress = serverAddress;
+    }
+
+    public int getServerPort() {
+        return serverPort;
+    }
+
+    public void setServerPort(int serverPort) {
+        this.serverPort = serverPort;
+    }
+
+    public ServerConfig() {
+        this.serverAddress = initializeServerAddress();
+        this.serverPort = initializeServerPort();
+    }
+
+    private String initializeServerAddress() {
+        Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter a valid server IP address : ");
         String serverAddress = scanner.nextLine();
 
@@ -41,7 +39,8 @@ public class Serveur {
         return serverAddress;
     }
 
-    private static int getServerPort(Scanner scanner) {
+    private int initializeServerPort() {
+        Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter server port (5000-5050) : ");
         String serverPort = scanner.nextLine();
 
@@ -52,7 +51,7 @@ public class Serveur {
         return Integer.parseInt(serverPort);
     }
 
-    private static boolean isServerAddressValid(String serverAddress) {
+    private boolean isServerAddressValid(String serverAddress) {
         String[] splitServerAddress = serverAddress.split("\\.");
         if (splitServerAddress.length != 4) {
             return false;
@@ -72,7 +71,7 @@ public class Serveur {
         return true;
     }
 
-    private static boolean isServerPortValid(String serverPort) {
+    private boolean isServerPortValid(String serverPort) {
         try {
             int parsedServerPort = Integer.parseInt(serverPort);
             if (parsedServerPort < 5000 || parsedServerPort > 5050) {
