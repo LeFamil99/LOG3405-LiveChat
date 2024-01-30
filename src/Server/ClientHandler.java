@@ -6,9 +6,11 @@ import java.net.Socket;
 public class ClientHandler extends Thread { // pour traiter la demande de chaque client sur un socket particulier
     private Socket socket;
     private int clientNumber;
-    public ClientHandler(Socket socket, int clientNumber) {
+    private Server server;
+    public ClientHandler(Socket socket, int clientNumber, Server server) {
         this.socket = socket;
         this.clientNumber = clientNumber;
+        this.server = server
         System.out.println("New connection with client#" + clientNumber + " at" + socket);
     }
     public void run() { // Création de thread qui envoi un message à un client
