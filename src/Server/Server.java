@@ -3,10 +3,15 @@ package Server;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
 
 public class Server {
+    private DatabaseService databaseService;
     private ServerSocket Listener;
-    public Server(ServerConfig config) throws Exception {
+    private int numClients = 0;
+    private ArrayList<ClientHandler> clients = new ArrayList<>();
+    public Server(ServerConfig config, DatabaseService databaseService) throws Exception {
         try {
             Listener = new ServerSocket();
             Listener.setReuseAddress(true);
@@ -21,8 +26,14 @@ public class Server {
 
     public void listen() throws Exception {
         while (true) {
-            new ClientHandler(Listener.accept(), 0).start();
+            Socket socket = Listener.accept();
+            numClients++;
+            this.clients.add(new ClientHandler(socket, this, databaseService));
         }
+    }
+
+    public void handleNewMessage() {
+        //TODO: Cette méthode sera appelée par les ClientHandlers. Gérer le message reçu (l'enregistrer et lle transmettre aux autres clients)
     }
 
     public void close() throws Exception {
