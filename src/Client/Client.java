@@ -28,7 +28,7 @@ public class Client {
 
         Thread listenToUserThread = new Thread(() -> {
             try {
-                this.listenToServer();
+                this.listenToUser();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -51,8 +51,21 @@ public class Client {
         }
     }
 
-    public void listenToUser () {
-        // TODO
+    public void listenToUser() throws IOException {
+        Scanner scanner = new Scanner(System.in);
+        DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+        while (true){
+            try {
+                String message = scanner.nextLine();
+                out.writeUTF(message);
+            } catch (EOFException e) {
+                System.out.println("Connection closed by the server.");
+                break;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     public void stateHandle() throws IOException {
