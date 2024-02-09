@@ -12,6 +12,8 @@ public class Server {
     private int numClients = 0;
     private ArrayList<ClientHandler> clients = new ArrayList<>();
     public Server(ServerConfig config, DatabaseService databaseService) throws Exception {
+        this.databaseService = databaseService;
+
         try {
             Listener = new ServerSocket();
             InetAddress serverIP = InetAddress.getByName(config.getServerAddress());
@@ -27,7 +29,10 @@ public class Server {
         while (true) {
             Socket socket = Listener.accept();
             numClients++;
-            this.clients.add(new ClientHandler(socket, this, databaseService));
+
+            ClientHandler client = new ClientHandler(socket, this, databaseService);
+            client.start();
+            this.clients.add(client);
         }
     }
 

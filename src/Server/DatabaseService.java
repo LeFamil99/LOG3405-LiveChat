@@ -7,10 +7,11 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class DatabaseService {
-    private final String AUTH_DB_PATH = "./auth.txt";
-    private final String MESSAGES_DB_PATH = "./messages.txt";
+    private final String AUTH_DB_PATH = "./src/Server/auth.txt";
+    private final String MESSAGES_DB_PATH = "./src/Server/messages.txt";
 
 
     public DatabaseService() {
@@ -64,7 +65,7 @@ public class DatabaseService {
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
             bufferedWriter.write(
-            message.getMessage() + "," +
+            encodeCommas(message.getMessage()) + "," +
                 message.getUsername() + "," +
                 message.getIpAddress() + "," +
                 message.getPort() + "," +
@@ -80,56 +81,62 @@ public class DatabaseService {
         }
     }
 
-    public ArrayList<Message> getLastMessages(int amount) {
-        try {
-            ArrayList<Message> messages = new ArrayList<>();
+    public ArrayList<Message> getLastMessages(int linesToRead) {
+        File file = new File(MESSAGES_DB_PATH);
+        ArrayList<Message> messages = new ArrayList<>();
 
-            RandomAccessFile randomAccessFile = new RandomAccessFile(MESSAGES_DB_PATH, "r");
-
-            FileChannel fileChannel = randomAccessFile.getChannel();
-
-            long fileLength = fileChannel.size();
-
-            ByteBuffer buffer = ByteBuffer.allocate(1024);
-
-            for (long position = fileLength - 1; position >= 0 && messages.size() <= amount; position--) {
-                fileChannel.position(position);
-
-                int bytesRead = fileChannel.read(buffer);
-
-                for (int i = bytesRead - 1; i >= 0; i--) {
-                    char currentChar = (char) buffer.get(i);
-                    if (currentChar == '\n') {
-                        messages.add(processMessageLine(buffer, i, bytesRead));
-                    }
-                }
-                buffer.rewind();
+        try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r")) {
+            long fileLength = file.length();
+            if(fileLength == 0) {
+                return messages;
             }
 
-            fileChannel.close();
-            randomAccessFile.close();
+            long position = fileLength - 1;
+            int linesRead = 0;
+            StringBuilder lastLine = new StringBuilder();
 
-            return messages;
+            randomAccessFile.seek(position);
+
+            while (position > 0 && linesRead < linesToRead) {
+                position--;
+                randomAccessFile.seek(position);
+                char c = (char) randomAccessFile.read();
+                if (c == '\n') {
+                    linesRead++;
+                    messages.add(processMessageLine(lastLine.toString()));
+                    lastLine = new StringBuilder();
+                }
+                lastLine.insert(0, c);
+            }
         } catch (IOException e) {
-            System.err.println("Error reading the file: " + e.getMessage());
+            e.printStackTrace();
         }
-        return new ArrayList<>();
+
+        Collections.reverse(messages);
+        return messages;
     }
 
-    private Message processMessageLine(ByteBuffer buffer, int start, int end) {
-        byte[] lineBytes = new byte[end - start];
-        buffer.get(lineBytes);
+    private static String reverseString(String str) {
+        return new StringBuilder(str).reverse().toString();
+    }
 
-        String line = new String(lineBytes);
+    private Message processMessageLine(String line) {
         String[] splitLine = line.split(",");
-
         return new Message(
-                splitLine[0],
+                decodeCommas(splitLine[0]),
                 splitLine[1],
                 splitLine[2],
                 Integer.parseInt(splitLine[3]),
                 LocalDate.parse(splitLine[4], Message.dateFormatter),
                 LocalTime.parse(splitLine[5], Message.timeFormatter)
         );
+    }
+
+    private String encodeCommas(String message) {
+        return message.replaceAll(",", "f73ks73n");
+    }
+
+    private String decodeCommas(String message) {
+        return message.replaceAll("f73ks73n", ",");
     }
 }

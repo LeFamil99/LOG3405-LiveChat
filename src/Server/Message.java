@@ -12,8 +12,8 @@ public class Message {
     private final LocalDate date;
     private final LocalTime time;
 
-    public static DateTimeFormatter dateFormatter;
-    public static DateTimeFormatter timeFormatter;
+    public static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    public static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
     public Message(String message, String username, String ipAddress, int port, LocalDate date, LocalTime time) {
         this.message = message;
         this.username = username;
@@ -21,9 +21,6 @@ public class Message {
         this.port = port;
         this.date = date;
         this.time = time;
-
-        dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
     }
 
     public String getMessage() {

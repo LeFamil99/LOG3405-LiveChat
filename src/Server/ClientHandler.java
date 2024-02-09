@@ -17,7 +17,7 @@ public class ClientHandler extends Thread {
     private String username;
     private String ip;
     private int port;
-    private boolean isConnected;
+    private boolean isConnected = false;
     public ClientHandler(Socket socket, Server server, DatabaseService databaseService) throws IOException {
         this.databaseService = databaseService;
         this.server = server;
@@ -56,8 +56,17 @@ public class ClientHandler extends Thread {
             String username = splitCredentials[0];
             String password = splitCredentials[1];
 
-            if (password.equals(databaseService.getUserPassword(username))) {
+            String expectedPassword = databaseService.getUserPassword(username);
+            if (expectedPassword == null) {
+                databaseService.addUser(username, password);
                 isConnected = true;
+                this.username = username;
+
+                out.writeUTF("accepted");
+            } else if (password.equals(expectedPassword)) {
+                isConnected = true;
+                this.username = username;
+
                 out.writeUTF("accepted");
             } else {
                 out.writeUTF("refused");

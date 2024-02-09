@@ -9,12 +9,10 @@ import java.util.Scanner;
 
 public class Client {
     private static Socket socket;
-    // private ServerListener (thread)
     State state;
     
     public Client(ServerConfig config) throws Exception {
         socket = new Socket(config.getServerAddress(), config.getServerPort());
-        System.out.format("Server.Serveur lancé sur [%s:%d]", config.getServerAddress(), config.getServerPort());
         this.state = State.NOT_CONNECTED;
         this.stateHandle();
         Thread listenToServerThread = new Thread(() -> {
@@ -57,9 +55,13 @@ public class Client {
         while (true){
             try {
                 String message = scanner.nextLine();
-                out.writeUTF(message);
+                if(message.length() <= 200) {
+                    out.writeUTF(message);
+                } else {
+                    System.out.println("Le message est trop long, veuillez entrer un message de moins de 200 caractères.");
+                }
             } catch (EOFException e) {
-                System.out.println("Connection closed by the server.");
+                System.out.println("Connection fermées par le serveur");
                 break;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -78,20 +80,16 @@ public class Client {
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             out.writeUTF(username +"\n"+password);
             DataInputStream in = new DataInputStream(socket.getInputStream());
-            String awnser = in.readUTF();
-            if(awnser == "accepted"){
-                System.out.println("Succes Conenction");
+            String answer = in.readUTF();
+            if(answer.equals("accepted")){
+                System.out.println("Connecté avec succès");
                 this.state = State.CONNECTED;
             } else {
-                System.out.println("Erreur dans la saisie du mot de passe");
+                System.out.println("Mot de passe invalide");
             }
         }
         DataInputStream in = new DataInputStream(socket.getInputStream());
-        String fifteenmessage = in.readUTF();
-        System.out.println(fifteenmessage);
-    }
-
-    public void close() throws Exception {
-        socket.close();
+        String lastMessages = in.readUTF();
+        System.out.println(lastMessages);
     }
 }
