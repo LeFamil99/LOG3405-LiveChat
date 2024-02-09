@@ -2,6 +2,7 @@ package Server;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class Message {
     private final String message;
@@ -10,6 +11,9 @@ public class Message {
     private final int port;
     private final LocalDate date;
     private final LocalTime time;
+
+    public static DateTimeFormatter dateFormatter;
+    public static DateTimeFormatter timeFormatter;
     public Message(String message, String username, String ipAddress, int port, LocalDate date, LocalTime time) {
         this.message = message;
         this.username = username;
@@ -17,6 +21,9 @@ public class Message {
         this.port = port;
         this.date = date;
         this.time = time;
+
+        dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
     }
 
     public String getMessage() {
@@ -42,4 +49,5 @@ public class Message {
     public LocalTime getTime() {
         return time;
     }
+
 }

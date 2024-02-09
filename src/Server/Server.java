@@ -14,7 +14,6 @@ public class Server {
     public Server(ServerConfig config, DatabaseService databaseService) throws Exception {
         try {
             Listener = new ServerSocket();
-            Listener.setReuseAddress(true);
             InetAddress serverIP = InetAddress.getByName(config.getServerAddress());
 
             Listener.bind(new InetSocketAddress(serverIP, config.getServerPort()));
@@ -32,8 +31,11 @@ public class Server {
         }
     }
 
-    public void handleNewMessage() {
-        //TODO: Cette méthode sera appelée par les ClientHandlers. Gérer le message reçu (l'enregistrer et lle transmettre aux autres clients)
+    public void handleNewMessage(Message message) throws Exception {
+        databaseService.addMessage(message);
+        for (ClientHandler client : this.clients) {
+            client.sendMessageToClient(message);
+        }
     }
 
     public void close() throws Exception {

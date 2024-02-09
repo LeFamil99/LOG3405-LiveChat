@@ -12,12 +12,8 @@ public class DatabaseService {
     private final String AUTH_DB_PATH = "./auth.txt";
     private final String MESSAGES_DB_PATH = "./messages.txt";
 
-    DateTimeFormatter dateFormatter;
-    DateTimeFormatter timeFormatter;
 
     public DatabaseService() {
-        dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
     }
 
     public String getUserPassword(String targetedUsername) {
@@ -72,8 +68,8 @@ public class DatabaseService {
                 message.getUsername() + "," +
                 message.getIpAddress() + "," +
                 message.getPort() + "," +
-                dateFormatter.format(message.getDate()) + "," +
-                timeFormatter.format(message.getTime()) + ","
+                Message.dateFormatter.format(message.getDate()) + "," +
+                Message.timeFormatter.format(message.getTime()) + ","
             );
             bufferedWriter.newLine();
 
@@ -96,7 +92,7 @@ public class DatabaseService {
 
             ByteBuffer buffer = ByteBuffer.allocate(1024);
 
-            for (long position = fileLength - 1; position >= 0; position--) {
+            for (long position = fileLength - 1; position >= 0 && messages.size() <= amount; position--) {
                 fileChannel.position(position);
 
                 int bytesRead = fileChannel.read(buffer);
@@ -132,8 +128,8 @@ public class DatabaseService {
                 splitLine[1],
                 splitLine[2],
                 Integer.parseInt(splitLine[3]),
-                LocalDate.parse(splitLine[4], dateFormatter),
-                LocalTime.parse(splitLine[5], timeFormatter)
+                LocalDate.parse(splitLine[4], Message.dateFormatter),
+                LocalTime.parse(splitLine[5], Message.timeFormatter)
         );
     }
 }
