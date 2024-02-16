@@ -9,7 +9,6 @@ import java.util.ArrayList;
 public class Server {
     private DatabaseService databaseService;
     private ServerSocket Listener;
-    private int numClients = 0;
     private ArrayList<ClientHandler> clients = new ArrayList<>();
     public Server(ServerConfig config, DatabaseService databaseService) throws Exception {
         this.databaseService = databaseService;
@@ -28,7 +27,6 @@ public class Server {
     public void listen() throws Exception {
         while (true) {
             Socket socket = Listener.accept();
-            numClients++;
 
             ClientHandler client = new ClientHandler(socket, this, databaseService);
             client.start();

@@ -1,20 +1,46 @@
 package Server;
 
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 
 public class DatabaseService {
-    private final String AUTH_DB_PATH = "./src/Server/auth.txt";
-    private final String MESSAGES_DB_PATH = "./src/Server/messages.txt";
+    private final String AUTH_DB_PATH = "./auth.txt";
+    private final String MESSAGES_DB_PATH = "./messages.txt";
 
 
     public DatabaseService() {
+        try {
+            FileReader fileReader = new FileReader(AUTH_DB_PATH);
+        } catch (FileNotFoundException e1) {
+            File authFile = new File("auth.txt");
+
+            try {
+                authFile.createNewFile();
+            } catch (IOException e2) {
+                e2.printStackTrace();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            FileReader fileReader = new FileReader(MESSAGES_DB_PATH);
+        } catch (FileNotFoundException e1) {
+            File messagesFile = new File("messages.txt");
+
+            try {
+                messagesFile.createNewFile();
+            } catch (IOException e2) {
+                e2.printStackTrace();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getUserPassword(String targetedUsername) {
